@@ -7,7 +7,7 @@ The Neo build has been optimised to clean down memory where possible so the core
 amount of memory available for the emulators. Ensuring less slow down, more stability and more 
 reliable game play.
 
-We will endeavour to include more optimisations to the build as when they arise.
+We will endeavour to include more optimisations to the build as and when they arise.
 
 Works with both the NESC & SNESC!
 

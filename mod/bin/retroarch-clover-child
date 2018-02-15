@@ -39,8 +39,7 @@ done
 
 [ ! -z "$demo" ] && load=$(dirname $load)/savestate
 
-# (Re)create cache folder
-rm -rf /var/cache/retroarch/
+# Create cache folder
 mkdir -p /var/cache/retroarch/
 
 # saves if any
@@ -80,6 +79,7 @@ ts=$(date +"%s")
 tm=0
 [ -f "$timefile_load" ] && tm=$(cat "$timefile_load")
 
+# Clear Caches/Buffers
 sync
 echo 3 > /proc/sys/vm/drop_caches
 

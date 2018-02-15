@@ -3,12 +3,11 @@ version 1.7.0
 
 New and improved version of RetroArch for Hakchi.
 
-The Neo build has been optimised to clean down memory were possible so the cores have the full
+The Neo build has been optimised to clean down memory where possible so the cores have the full
 amount of memory available for the emulators. Ensuring less slow down, more stability and more 
-relaible game play. CompCom also made a lot of optimisation for the controls which reduces input
-lag and other things.
+reliable game play.
 
-We will endever to include more optimisations to the build as when they arise.
+We will endeavour to include more optimisations to the build as when they arise.
 
 Works with both the NESC & SNESC!
 

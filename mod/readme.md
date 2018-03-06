@@ -1,5 +1,7 @@
 -----------------------
-# RetroArch Neo 1.7.1a
+Name: RetroArch Neo 1.7.1a
+Creator: TheOtherGuys
+Category: RetroArch
 -----------------------
 
 RetroArch Neo consists of merged code from both the Original Team & 'TheOtherGuys'
@@ -28,7 +30,7 @@ fceumm (NES, many mappers, UNIF support)
 nestopia (NES, FDS)
 ```
 
-
+<br>
 Available executables and arguments to run Cores:
 
 ```
@@ -36,45 +38,45 @@ Available executables and arguments to run Cores:
 /bin/nestopia <core> <rom> <clover_args>
 ```
 
-
+<br>
 Runs RetroArch with specified core (it parses all clover arguments: saves, aspect ratio, etc.), designed for executing from clover shell:
 
 ```
 /bin/retroarch-clover <core> <rom> <clover_args>
 ```
 
-
+<br>
 Runs "fceumm" core or "nestopia" for FDS games:
 
 ```
 /bin/nes <rom> <clover_args>
 ```
 
-
+<br>
 Runs RetroArch directly, without clover integration:
 
 ```
 /bin/retroarch-mini [core] [rom] [args]
 ```
 
-
+<br>
 RetroArch binary:
 
 ```
 /bin/retroarch
 ```
-
+<br>
 
 
 #### **Original Team:**
 ##### Compiled & Updated by:
 Cluster, KMFDManic, madmonkey, pcm
-
+<br><br>
 
 #### **Neo Build Additions by:**
 ##### 'TheOtherGuys':
 CompCom, Swingflip, Viral_DNA
-
+<br><br>
 
 Cores by libretro
 

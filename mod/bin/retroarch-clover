@@ -1,7 +1,13 @@
 #!/bin/sh
 
 # Kill it! Kill it with fire!
+
+source /etc/preinit
+script_init
+
 pkill -KILL clover-mcp
+
+decodepng "$rootfs/share/retroarch/assets/loading-min.png" > /dev/fb0;
 
 core="$1"
 rom="$2"

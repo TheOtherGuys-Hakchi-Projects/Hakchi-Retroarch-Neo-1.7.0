@@ -1,7 +1,13 @@
 #!/bin/sh
 
 set -x
+
+source /etc/preinit
+script_init
+
 export MALI_NOCLEAR=1
+
+decodepng "$rootfs/share/retroarch/assets/loading-min.png" > /dev/fb0;
 
 supported_mappers="0 1 2 3 4 5 7 9 10 86 87 184"
 emulator=retroarch

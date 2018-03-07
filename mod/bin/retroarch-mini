@@ -5,7 +5,7 @@ script_init
 
 export HOME=/etc/libretro
 
-decodepng "$rootfs/share/retroarch/assets/loading-min.png" > /dev/fb0;
+decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
 
 mkdir -p /var/cache/retroarch/
 

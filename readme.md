@@ -4,20 +4,17 @@
 
 RetroArch Neo consists of merged code from both the Original Team & 'TheOtherGuys'
 
-The Neo Additions contain a set of very clever & carefully calculated optimizations to clear & ensure
-more memory is always available for emulation via RetroArch.
-This minimizes potential slowdowns, as well as allows for more reliable game play.
+The Neo build should be considered the standard default 'stable' release for hakchi for your NESC & SNESC.
 
-Feedback from the Community at large will always be most paramount as far as future changes for the better!
+RetroArch Neo allows you to add libretro cores to your NESC & SNESC to allow you to emulate different consoles and other SNES emulators.
 
+## What's new in RetroArch 'Neo' 1.7.1c
 
-Note: Now works with both the NESC & SNESC!
-
-
-This is a hakchi/hakchi2 module which adds libretro cores and RetroArch frontend to your NES/SNES Mini.
-If using older than 2.20 Hakchi, this will not work on your NES/SNES Mini properly.
-
-It can also run games for other consoles.
+ - Added the 64/PSX optimisations by default. (Also bundled them so they can be reloaded using a option choice
+ - Added --debug-usb and --debug-nand to RA so if you add this to the end of the exec command it will log your games log file to /media/GAME_retroarch.log or /tmp/GAME_retroarch.log
+ - Kept input polling method to 2
+ - Added "Loading..." screen to the canoe emulator too
+ - Added "RetroArch Loading..." screen when launching via retroarch
 
 
 
@@ -28,7 +25,7 @@ fceumm (NES, many mappers, UNIF support)
 nestopia (NES, FDS)
 ```
 
-
+<br>
 Available executables and arguments to run Cores:
 
 ```
@@ -36,45 +33,47 @@ Available executables and arguments to run Cores:
 /bin/nestopia <core> <rom> <clover_args>
 ```
 
-
+<br>
 Runs RetroArch with specified core (it parses all clover arguments: saves, aspect ratio, etc.), designed for executing from clover shell:
 
 ```
 /bin/retroarch-clover <core> <rom> <clover_args>
 ```
 
-
+<br>
 Runs "fceumm" core or "nestopia" for FDS games:
 
 ```
 /bin/nes <rom> <clover_args>
 ```
 
-
+<br>
 Runs RetroArch directly, without clover integration:
 
 ```
 /bin/retroarch-mini [core] [rom] [args]
 ```
 
-
+<br>
 RetroArch binary:
 
 ```
 /bin/retroarch
 ```
-
-
-
-#### **Original Team:**
-##### Compiled & Updated by:
-Cluster, KMFDManic, madmonkey, pcm
-
+<br>
 
 #### **Neo Build Additions by:**
 ##### 'TheOtherGuys':
 CompCom, Swingflip, Viral_DNA
 
+#### Special Thanks to Friends & Testers of 'TheOtherGuys'
+DefKorns, Advokaten, Bslenul, DarkDev1, Princess_Daphie, ThanosRD
+
+#### **Original Team:**
+##### Compiled & Updated by:
+Cluster, KMFDManic, madmonkey, pcm
+<br><br>
+<br><br>
 
 Cores by libretro
 

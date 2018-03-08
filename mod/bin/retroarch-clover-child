@@ -16,6 +16,7 @@ rsav="/var/cache/retroarch/$id.sav"
 t_suffix=_time.txt
 demo_time=30
 debug=0
+logend="_RetroArch.log"
 shift 2
 
 while [ $# -gt 0 ]; do
@@ -83,6 +84,15 @@ overlay2=$(echo "$overlay2" | sed 's/\//\\\//g')
 sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "'$overlay1'"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
 sed -i -e 's/overlay0_desc0_overlay = "[^"]*"/overlay0_desc0_overlay = "'$overlay2'"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
 
+# Prevent RetroArch from fucking up the scanlines on NESC...
+if grep -Fxq "input_overlay_enable = \"true\"" /etc/libretro/retroarch.cfg
+then
+  if grep -Fxq "overlay0_overlay = \"\"" /etc/libretro/.config/retroarch/overlay/scanlines.cfg
+  then
+    sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "scanlines.png"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
+  fi
+fi
+
 # Start timestamp
 ts=$(date +"%s")
 tm=0
@@ -92,14 +102,16 @@ tm=0
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
+
+
 if [ "$debug" == "0" ]; then #Default
   retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra &
 fi 
 if [ "$debug" == "1" ]; then #Verbose USB mode
-  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/$(rom)_RetroArch.log 2>&1 &
+  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/"$filename"_RetroArch.log 2>&1 &
 fi 
 if [ "$debug" == "2" ]; then #Verbose NAND mode
-  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /tmp/$(rom)_RetroArch.log 2>&1 &
+  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /tmp/"$filename"_RetroArch.log 2>&1 &
 fi 
 rpid=$!
 

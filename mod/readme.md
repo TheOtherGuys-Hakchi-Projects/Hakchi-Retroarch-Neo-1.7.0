@@ -1,5 +1,5 @@
 -----------------------
-Name: RetroArch Neo 1.7.0
+Name: RetroArch Neo 1.7.1c
 Creator: TheOtherGuys
 Category: RetroArch
 -----------------------

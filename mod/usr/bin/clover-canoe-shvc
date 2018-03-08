@@ -2,7 +2,12 @@
 
 set -x
 
+source /etc/preinit
+script_init
+
 export MALI_NOCLEAR=1
+
+decodepng "$rootfs/share/retroarch/assets/loading-min.png" > /dev/fb0;
 
 decorative_options()
 {

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+source /etc/preinit
+script_init
+
 HOME=/etc/libretro
 corename=$1
 core=$HOME/core/$1_libretro.so
@@ -12,6 +15,7 @@ rsram="/var/cache/retroarch/$id.srm"
 rsav="/var/cache/retroarch/$id.sav"
 t_suffix=_time.txt
 demo_time=30
+debug=0
 shift 2
 
 while [ $# -gt 0 ]; do
@@ -31,6 +35,8 @@ while [ $# -gt 0 ]; do
   [ "$1" == "--save-time-path" ] && timefile_save=$2
   [ "$1" == "--replay-inputs" ] && demo=1
   [ "$1" == "--decorative-frame-path" ] && frame=$2
+  [ "$1" == "--debug-usb" ] && debug=1
+  [ "$1" == "--debug-nand" ] && debug=2
   shift
 done
 
@@ -58,6 +64,9 @@ else
   [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsram"
 fi
 
+#Refresh the framebuffer incase there is some left over FB process
+decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+
 smooth=$(cat /etc/libretro/$filter.smooth)
 sed -i -e 's/video_smooth = "[^"]*"/video_smooth = "'$smooth'"/g' /etc/libretro/retroarch.cfg
 ratio=$(cat /etc/libretro/$filter.ratio)
@@ -83,7 +92,15 @@ tm=0
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra &
+if [ "$debug" == "0" ]; then #Default
+  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra &
+fi 
+if [ "$debug" == "1" ]; then #Verbose USB mode
+  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/$(rom)_RetroArch.log 2>&1 &
+fi 
+if [ "$debug" == "2" ]; then #Verbose NAND mode
+  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /tmp/$(rom)_RetroArch.log 2>&1 &
+fi 
 rpid=$!
 
 [ ! -z "$save" ] && mkdir -p $(dirname "$save")

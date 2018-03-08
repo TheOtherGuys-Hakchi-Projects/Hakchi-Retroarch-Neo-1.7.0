@@ -1,5 +1,5 @@
 -----------------------
-# RetroArch Neo 1.7.0
+# RetroArch Neo 1.7.1a
 -----------------------
 
 RetroArch Neo consists of merged code from both the Original Team & 'TheOtherGuys'

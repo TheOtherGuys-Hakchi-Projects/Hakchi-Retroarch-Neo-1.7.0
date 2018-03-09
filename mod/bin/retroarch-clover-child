@@ -17,6 +17,7 @@ t_suffix=_time.txt
 demo_time=30
 debug=0
 logend="_RetroArch.log"
+bezel_mode=0
 shift 2
 
 while [ $# -gt 0 ]; do
@@ -27,9 +28,11 @@ while [ $# -gt 0 ]; do
   [ "$1" == "--save-screenshot-on-quit" ] && screenshot=$2
   [ "$1" == "--save-data-backing-file" ] && sram=$2
   [ "$1" == "--graphic-filter" ] && filter=$2
+  [ "$1" == "--enable-crt-scanlines" ] && crt=1
   [ "$1" == "--video-mode" ] && [ "$2" == "crt-filter" ] && filter=crt720 && crt=1
   [ "$1" == "--video-mode" ] && [ "$2" == "keep-aspect-ratio" ] && filter=gpu720
   [ "$1" == "--video-mode" ] && [ "$2" == "pixel-perfect" ] && filter=ppu
+  [ "$1" == "--bezel-mode" ] && bezel_mode=1
   [ "$1" == "--ra-extra" ] && extra=$2
   [ "$1" == "--ra-nosaves" ] && nosaves=1
   [ "$1" == "--load-time-path" ] && timefile_load=$2
@@ -85,13 +88,42 @@ sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "'$overlay1'"/g' /etc
 sed -i -e 's/overlay0_desc0_overlay = "[^"]*"/overlay0_desc0_overlay = "'$overlay2'"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
 
 # Prevent RetroArch from fucking up the scanlines on NESC...
-if grep -Fxq "input_overlay_enable = \"true\"" /etc/libretro/retroarch.cfg
+if grep -Fxq "input_overlay_enable = \"true\"" /etc/libretro/retroarch.cfg #If overlays are enabled...
 then
-  if grep -Fxq "overlay0_overlay = \"\"" /etc/libretro/.config/retroarch/overlay/scanlines.cfg
+  if [ "$filter" != "gpu720" ]
   then
-    sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "scanlines.png"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
+    if [ "$filter" != "ppu" ]
+    then
+	    if grep -Fxq "overlay0_overlay = \"\"" /etc/libretro/.config/retroarch/overlay/scanlines.cfg #And the overlay is NULL
+	    then
+        sed -i -e 's/video_smooth = "[^"]*"/video_smooth = "false"/g' /etc/libretro/retroarch.cfg
+        sed -i -e 's/aspect_ratio_index = "[^"]*"/aspect_ratio_index = "22"/g' /etc/libretro/retroarch.cfg
+	      sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "scanlines.png"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
+	    fi
+    fi
   fi
 fi
+
+#new bezel mode
+if [ "$filter" == "gpu720" ] && [ "$bezel_mode" == "1" ]; then #4:3 and bezel mode active
+  bezel_width=877 && bezel_height=672 && bezel_x=201 && bezel_y=24 && bezel_exe=1
+fi
+
+if [ "$filter" == "ppu" ] && [ "$bezel_mode" == "1" ]; then #1:1 and bezel mode active
+  bezel_width=768 && bezel_height=672 && bezel_x=256 && bezel_y=24 && bezel_exe=1
+fi
+
+if [ "$filter" != "gpu720" ] && [ "$filter" != "ppu" ] && [ "$bezel_mode" == "1" ]; then #CRT and bezel mode active
+  bezel_width=877 && bezel_height=672 && bezel_x=201 && bezel_y=24 && bezel_exe=1
+fi
+
+if [ ! -z "$bezel_exe" ]; then
+  sed -i -e 's/aspect_ratio_index = "[^"]*"/aspect_ratio_index = "22"/g' /etc/libretro/retroarch.cfg #Custom aspect ratio
+  sed -i -e 's/custom_viewport_width = "[^"]*"/custom_viewport_width = "'$bezel_width'"/g' /etc/libretro/retroarch.cfg
+  sed -i -e 's/custom_viewport_height = "[^"]*"/custom_viewport_height = "'$bezel_height'"/g' /etc/libretro/retroarch.cfg
+  sed -i -e 's/custom_viewport_x = "[^"]*"/custom_viewport_x = "'$bezel_x'"/g' /etc/libretro/retroarch.cfg
+  sed -i -e 's/custom_viewport_y = "[^"]*"/custom_viewport_y = "'$bezel_y'"/g' /etc/libretro/retroarch.cfg
+fi 
 
 # Start timestamp
 ts=$(date +"%s")
@@ -101,8 +133,6 @@ tm=0
 # Clear Caches/Buffers
 sync
 echo 3 > /proc/sys/vm/drop_caches
-
-
 
 if [ "$debug" == "0" ]; then #Default
   retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra &

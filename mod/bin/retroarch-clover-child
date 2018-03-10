@@ -78,31 +78,17 @@ sed -i -e 's/aspect_ratio_index = "[^"]*"/aspect_ratio_index = "'$ratio'"/g' /et
 overlay=$(cat /etc/libretro/$filter.overlay)
 sed -i -e 's/input_overlay_enable = "[^"]*"/input_overlay_enable = "'$overlay'"/g' /etc/libretro/retroarch.cfg
 
-[ ! -z "$crt" ] && overlay1=scanlines.png
-if [ ! -z "$frame" ]; then
-  [ -z "$crt" ] && overlay1=$frame.png || overlay2=$frame.png
+if [ "$filter" == "crt720" ]; then
+  overlay1=scanlines.png
+fi
+if [ "$sftype" == "nes" ] && [ ! "$filter" == "crt720" ]; then
+  overlay1=
+fi
+if [ "$sftype" == "snes" ] && [ ! "$filter" == "crt720" ]; then
+  overlay1=$frame.png
 fi
 overlay1=$(echo "$overlay1" | sed 's/\//\\\//g')
-overlay2=$(echo "$overlay2" | sed 's/\//\\\//g')
 sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "'$overlay1'"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
-sed -i -e 's/overlay0_desc0_overlay = "[^"]*"/overlay0_desc0_overlay = "'$overlay2'"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
-
-# Prevent RetroArch from fucking up the scanlines on NESC...
-if grep -Fxq "input_overlay_enable = \"true\"" /etc/libretro/retroarch.cfg #If overlays are enabled...
-then
-  if [ "$filter" != "gpu720" ]
-  then
-    if [ "$filter" != "ppu" ]
-    then
-	    if grep -Fxq "overlay0_overlay = \"\"" /etc/libretro/.config/retroarch/overlay/scanlines.cfg #And the overlay is NULL
-	    then
-        sed -i -e 's/video_smooth = "[^"]*"/video_smooth = "false"/g' /etc/libretro/retroarch.cfg
-        sed -i -e 's/aspect_ratio_index = "[^"]*"/aspect_ratio_index = "22"/g' /etc/libretro/retroarch.cfg
-	      sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "scanlines.png"/g' /etc/libretro/.config/retroarch/overlay/scanlines.cfg
-	    fi
-    fi
-  fi
-fi
 
 #new bezel mode
 if [ "$filter" == "gpu720" ] && [ "$bezel_mode" == "1" ]; then #4:3 and bezel mode active

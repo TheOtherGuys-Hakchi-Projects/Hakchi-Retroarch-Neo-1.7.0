@@ -32,6 +32,9 @@ while [ $# -gt 0 ]; do
   [ "$1" == "--video-mode" ] && [ "$2" == "crt-filter" ] && filter=crt720 && crt=1
   [ "$1" == "--video-mode" ] && [ "$2" == "keep-aspect-ratio" ] && filter=gpu720
   [ "$1" == "--video-mode" ] && [ "$2" == "pixel-perfect" ] && filter=ppu
+  [ "$1" == "--smooth43" ] && smooth43=1
+  [ "$1" == "--no-smooth" ] && no_smooth=1
+  [ "$1" == "--no-scanlines" ] && no_scanlines=1
   [ "$1" == "--bezel-mode" ] && bezel_mode=1
   [ "$1" == "--ra-extra" ] && extra=$2
   [ "$1" == "--ra-nosaves" ] && nosaves=1
@@ -74,6 +77,12 @@ decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
 # Check if its S/NES core
 s_nes=$(echo "$corename" | grep "nestopia\|fceumm\|snes")
 
+# Check if its a GB/C or GG game
+gb_gg=$(echo "$rom" | grep -e "\.gb$\|\.gb\.\|\.gbc\|.sgb\|.dmg\|.gg")
+
+# Check if its a GBA game
+gba=$(echo "$rom" | grep -e "\.gba")
+
 # Functions to make the rest easier
 smooth () {
 sed -i -e 's/video_smooth = "[^"]*"/video_smooth = "'$1'"/g' /etc/libretro/retroarch.cfg
@@ -102,8 +111,14 @@ if [ ! -z "$s_nes" ] || [ "$bezel_mode" == "1" ]; then
   if [ "$filter" == "crt720" ]; then
     smooth true && ratio 22 && overlay true && width 877 && height 672 && posx 201 && posy 24
   fi
+  if [ "$filter" == "crt720" ] && [ ! -z "$no_smooth" ]; then
+    smooth false
+  fi
   if [ "$filter" == "gpu720" ]; then
     smooth false && ratio 22 && overlay true && width 877 && height 672 && posx 201 && posy 24
+  fi
+  if [ "$filter" == "gpu720" ] && [ ! -z "$smooth43" ]; then
+    smooth true
   fi
   if [ "$filter" == "ppu" ]; then
     smooth false && ratio 22 && overlay true && width 768 && height 672 && posx 256 && posy 24
@@ -112,17 +127,39 @@ else
   if [ "$filter" == "crt720" ]; then
     smooth true && ratio 0 && overlay true
   fi
+  if [ "$filter" == "crt720" ] && [ ! -z "$no_smooth" ]; then
+    smooth false
+  fi
+  if [ "$filter" == "crt720" ] && [ ! -z "$no_scanlines" ]; then
+    overlay false
+  fi
   if [ "$filter" == "gpu720" ]; then
     smooth false && ratio 0 && overlay false
   fi
+  if [ "$filter" == "gpu720" ] && [ ! -z "$smooth43" ]; then
+    smooth true
+  fi
   if [ "$filter" == "ppu" ]; then
     smooth false && ratio 20 && overlay false
+  fi
+  if [ ! -z "$gb_gg" ]; then
+    ratio 22 && width 640 && height 576
+  fi
+  if [ ! -z "$gba" ]; then
+    ratio 22 && width 720 && height 480
   fi
 fi
 
 # Using scanlines or not
 if [ "$filter" == "crt720" ]; then
   overlay1=scanlines.png
+fi
+if [ "$filter" == "crt720" ] && [ ! -z "$no_scanlines" ]; then
+  if [ "$sftype" == "nes" ]; then
+    overlay1=
+  else
+    overlay1=$frame.png
+  fi
 fi
 if [ "$sftype" == "nes" ] && [ ! "$filter" == "crt720" ]; then
   overlay1=

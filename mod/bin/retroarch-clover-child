@@ -86,11 +86,11 @@ fi
 # Check if its S/NES core
 s_nes=$(echo "$corename" | grep "nestopia\|fceumm\|snes")
 
-# Check if its a GB/C or GG game
-gb_gg=$(echo "$rom" | grep -e "\.gb$\|\.gb\.\|\.gbc\|.sgb\|.dmg\|.gg")
+# Check if its a GB/GBC or GG game
+gb_gg=$(echo "$rom" | grep -e "\.gb$\|\.gb\.\|\.gbc\|\.sgb\|\.dmg\|\.gg")
 
 # Check if its a GBA game
-gba=$(echo "$rom" | grep -e "\.gba")
+gba=$(echo "$corename" | grep "gba\|vba\|gpsp")
 
 # Functions to make the rest easier
 smooth () {

@@ -44,12 +44,12 @@ while [ $# -gt 0 ]; do
   [ "$1" == "--decorative-frame-path" ] && frame=$2
   [ "$1" == "--debug-usb" ] && debug=1
   [ "$1" == "--debug-nand" ] && debug=2
-  [ "$1" == "--console-loadscreen" ] && console_loadscreen=$2
+  [ "$1" == "--custom-loadscreen" ] && custom_loadscreen=$2
   shift
 done
 
-if [ ! -z "$console_loadscreen" ]; then
-	decodepng "$rootfs/share/retroarch/assets/$console_loadscreen" > /dev/fb0;
+if [ ! -z "$custom_loadscreen" ]; then
+	decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
 fi
 
 [ -z "$timefile_save" ] && timefile_save=$load$t_suffix
@@ -77,8 +77,8 @@ else
 fi
 
 #Refresh the framebuffer incase there is some left over FB process
-if [ ! -z "$console_loadscreen" ]; then
-	decodepng "$rootfs/share/retroarch/assets/$console_loadscreen" > /dev/fb0;
+if [ ! -z "$custom_loadscreen" ]; then
+	decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
 else
 	decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
 fi

@@ -44,8 +44,13 @@ while [ $# -gt 0 ]; do
   [ "$1" == "--decorative-frame-path" ] && frame=$2
   [ "$1" == "--debug-usb" ] && debug=1
   [ "$1" == "--debug-nand" ] && debug=2
+  [ "$1" == "--custom-loadscreen" ] && custom_loadscreen=$2
   shift
 done
+
+if [ ! -z "$custom_loadscreen" ]; then
+	decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
+fi
 
 [ -z "$timefile_save" ] && timefile_save=$load$t_suffix
 [ -z "$timefile_load" ] && timefile_load=$load$t_suffix
@@ -72,16 +77,20 @@ else
 fi
 
 #Refresh the framebuffer incase there is some left over FB process
-decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+if [ ! -z "$custom_loadscreen" ]; then
+	decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
+else
+	decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+fi
 
 # Check if its S/NES core
 s_nes=$(echo "$corename" | grep "nestopia\|fceumm\|snes")
 
-# Check if its a GB/C or GG game
-gb_gg=$(echo "$rom" | grep -e "\.gb$\|\.gb\.\|\.gbc\|.sgb\|.dmg\|.gg")
+# Check if its a GB/GBC or GG game
+gb_gg=$(echo "$rom" | grep -e "\.gb$\|\.gb\.\|\.gbc\|\.sgb\|\.dmg\|\.gg")
 
 # Check if its a GBA game
-gba=$(echo "$rom" | grep -e "\.gba")
+gba=$(echo "$corename" | grep "gba\|vba\|gpsp")
 
 # Functions to make the rest easier
 smooth () {

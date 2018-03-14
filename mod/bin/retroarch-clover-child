@@ -87,7 +87,7 @@ fi
 s_nes=$(echo "$corename" | grep "nestopia\|fceumm\|snes")
 
 # Check if its a GB/GBC or GG game
-gb_gg=$(echo "$rom" | grep -e "\.gb$\|\.gb\.\|\.gbc\|\.sgb\|\.dmg\|\.gg")
+gb_gg=$(echo "$rom" | grep -ie "\.gb$\|\.gb\.\|\.gbc\|\.sgb\|\.dmg\|\.gg")
 
 # Check if its a GBA game
 gba=$(echo "$corename" | grep "gba\|vba\|gpsp")

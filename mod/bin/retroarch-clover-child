@@ -179,15 +179,6 @@ fi
 overlay1=$(echo "$overlay1" | sed 's/\//\\\//g')
 sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "'$overlay1'"/g' /etc/libretro/.config/retroarch/overlay/default.cfg
 
-# Set current SNESC border in current_border.cfg
-if [ "$sftype" == "snes" ]; then
-  overlay2=$frame.png
-else
-  overlay2=
-fi
-overlay2=$(echo "$overlay2" | sed 's/\//\\\//g')
-sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "'$overlay2'"/g' /etc/libretro/.config/retroarch/overlay/current_border.cfg
-
 # Start timestamp
 ts=$(date +"%s")
 tm=0

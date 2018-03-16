@@ -115,7 +115,21 @@ posy () {
 sed -i -e 's/custom_viewport_y = "[^"]*"/custom_viewport_y = "'$1'"/g' /etc/libretro/retroarch.cfg
 }
 
-# If S/NES games or --bezel-mode it will fit the overlay, if not games will start without overlay in 4:3 (+ smooth and scanlines if CRT) or 1:1
+clovercon_file=/dev/clovercon1
+clv=$(echo $rom | grep -o 'CLV-[^\\/]*')
+
+# Hold L button while starting the game to enable --bezel-mode
+if [ -e "$clovercon_file" ] && [ "$(cat $clovercon_file)" == "0004" ]; then
+  sed -i -e 's/^\(Exec\).*$/& --bezel-mode/' /usr/share/games/$clv/$clv.desktop
+  bezel_mode=1
+fi
+# Hold R button while starting the game to disable --bezel-mode
+if [ -e "$clovercon_file" ] && [ "$(cat $clovercon_file)" == "0008" ]; then
+  sed -i 's/ --bezel-mode//' /usr/share/games/$clv/$clv.desktop
+  bezel_mode=
+fi
+
+# If NES/SNES games or --bezel-mode it will fit the overlay, if not games will start without overlay in 4:3 (+ smooth and scanlines if CRT) or 1:1
 if [ ! -z "$s_nes" ] || [ "$bezel_mode" == "1" ]; then
   if [ "$filter" == "crt720" ]; then
     smooth true && ratio 22 && overlay true && width 877 && height 672 && posx 201 && posy 24

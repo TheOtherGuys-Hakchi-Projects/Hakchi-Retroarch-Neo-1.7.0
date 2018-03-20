@@ -121,10 +121,11 @@ if [ ! -z "$s_nes" ] || [ ! -z "$bezel_mode" ]; then
   [ "$filter" == "ppu" ] && smooth false && width 768 && posx 256
   ratio 22 && overlay true && overlay_file default.cfg && height 672 && posy 24 && int_scale true
 else
-  [ "$filter" == "crt720" ] && smooth true && ratio 0 && overlay true && overlay_file scanlines.cfg
+  [ "$filter" == "crt720" ] && smooth true && width 877 && posx 201 && ratio 0 && overlay true && overlay_file scanlines.cfg
   [ "$filter" == "crt720" ] && [ ! -z "$no_scanlines" ] && overlay false
-  [ "$filter" == "gpu720" ] && smooth false && ratio 0 && overlay false
+  [ "$filter" == "gpu720" ] && smooth false && width 877 && posx 201 && ratio 0 && overlay false
   [ "$filter" == "ppu" ] && smooth false && ratio 20 && overlay false
+  height 672 && posy 24
   [ ! -z "$gb_gg" ] && ratio 22 && width 640 && height 576 && int_scale true
   [ ! -z "$gba" ] && ratio 22 && width 720 && height 480 && int_scale true
 fi

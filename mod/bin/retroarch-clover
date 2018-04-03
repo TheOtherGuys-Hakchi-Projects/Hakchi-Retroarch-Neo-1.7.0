@@ -7,8 +7,6 @@ script_init
 
 pkill -KILL clover-mcp
 
-decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
-
 core="$1"
 rom="$2"
 shift 2

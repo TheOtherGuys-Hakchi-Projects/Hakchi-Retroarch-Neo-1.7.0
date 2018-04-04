@@ -21,6 +21,16 @@ clovercon_file=/dev/clovercon1
 logend="_RetroArch.log"
 shift 2
 
+if [ ! -z "$custom_loadscreen" ]; then
+  decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
+else
+  if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename"_min.png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+    decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename"_min.png"  > /dev/fb0;
+  else
+    decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+  fi
+fi
+
 while [ $# -gt 0 ]; do
   [ "$1" == "--load-state-file" ] && load=$2
   [ "$1" == "--save-on-quit" ] && save=$2
@@ -76,7 +86,7 @@ fi
 
 #Refresh the framebuffer incase there is some left over FB process
 if [ ! -z "$custom_loadscreen" ]; then
-	decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
+  decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
 else
   if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename"_min.png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
     decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename"_min.png"  > /dev/fb0;

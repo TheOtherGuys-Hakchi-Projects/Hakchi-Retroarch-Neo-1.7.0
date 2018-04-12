@@ -24,10 +24,14 @@ shift 2
 if [ ! -z "$custom_loadscreen" ]; then
   decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
 else
-  if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename"_min.png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-    decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename"_min.png"  > /dev/fb0;
+  if [ -f "$mountpoint/media/hakhci/RA_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+	decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
   else
-    decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+    if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
+    else
+	  decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+    fi
   fi
 fi
 
@@ -88,10 +92,14 @@ fi
 if [ ! -z "$custom_loadscreen" ]; then
   decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
 else
-  if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename"_min.png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-    decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename"_min.png"  > /dev/fb0;
+  if [ -f "$mountpoint/media/hakhci/RA_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+	decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
   else
-    decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+    if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
+    else
+	  decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+    fi
   fi
 fi
 

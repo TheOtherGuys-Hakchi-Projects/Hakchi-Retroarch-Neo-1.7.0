@@ -21,11 +21,17 @@ clovercon_file=/dev/clovercon1
 logend="_RetroArch.log"
 shift 2
 
+if [[ $corename = *"prboom"* ]]; then
+  if [[ $corename = *"tyrquake"* ]]; then
+    umount "$rootfs/share/retroarch/assets/RAloading-min.png"
+  fi
+fi
+
 if [ ! -z "$custom_loadscreen" ]; then
   decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
 else
   if [ -f "$mountpoint/media/hakhci/RA_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-	decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
+	  decodepng "$mountpoint/media/hakhci/RA_loading_screens/"$corename".png"  > /dev/fb0;
   else
     if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
 	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
@@ -96,7 +102,7 @@ if [ ! -z "$custom_loadscreen" ]; then
   decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
 else
   if [ -f "$mountpoint/media/hakhci/RA_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-	decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
+	  decodepng "$mountpoint/media/hakhci/RA_loading_screens/"$corename".png"  > /dev/fb0;
   else
     if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
 	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;

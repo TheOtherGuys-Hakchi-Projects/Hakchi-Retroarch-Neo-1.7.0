@@ -65,8 +65,11 @@ done
 
 [ ! -z "$demo" ] && load=$(dirname $load)/savestate
 
-# Create cache folder
+# Create cache folder and copy savestates from USB if any
 mkdir -p /var/cache/retroarch/
+if [ -d "/media/hakchi" ] && ls /media/data/ra_savestates/$title_code/$id.state*; then
+  cp /media/data/ra_savestates/$title_code/$id.state* /var/cache/retroarch
+fi
 
 # saves if any
 if [ ! -z "$load" ] && [ -f "$load" ] && [ -z "$nosaves" ]; then
@@ -228,7 +231,11 @@ if [ "$bezel_mode" == "1" ]; then
   sed -i -e 's/custom_viewport_y = "[^"]*"/custom_viewport_y = "'$current_posy'"/g' /etc/libretro/retroarch.cfg
 fi
 
-# Remove cache folder
+# Copy savestates to USB if any and remove cache folder
+if [ -d "/media/hakchi" ] && ls /var/cache/retroarch/$id.*[^auto]; then
+  [ ! -d "/media/data/ra_savestates/$title_code" ] && mkdir -p /media/data/ra_savestates/$title_code
+  cp /var/cache/retroarch/$id.*[^auto] /media/data/ra_savestates/$title_code
+fi
 rm -rf /var/cache/retroarch/
 
 # Clear Caches/Buffers

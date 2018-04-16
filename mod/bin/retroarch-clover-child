@@ -80,6 +80,9 @@ mkdir -p /var/cache/retroarch/
 if [ -d "/media/hakchi" ] && ls /media/data/ra_savestates/$title_code/$id.state*; then
   cp /media/data/ra_savestates/$title_code/$id.state* /var/cache/retroarch
 fi
+if echo $corename | grep mame; then
+  [ -d "/etc/libretro/.config/retroarch/config/arcade/$corename" ] && mv /etc/libretro/.config/retroarch/config/arcade/$corename /var/cache/retroarch
+fi
 
 # saves if any
 if [ ! -z "$load" ] && [ -f "$load" ] && [ -z "$nosaves" ]; then
@@ -249,6 +252,10 @@ fi
 if [ -d "/media/hakchi" ] && ls /var/cache/retroarch/$id.*[^auto]; then
   [ ! -d "/media/data/ra_savestates/$title_code" ] && mkdir -p /media/data/ra_savestates/$title_code
   cp /var/cache/retroarch/$id.*[^auto] /media/data/ra_savestates/$title_code
+fi
+if echo $corename | grep mame; then
+  [ ! -d "/etc/libretro/.config/retroarch/config/arcade" ] && mkdir -p /etc/libretro/.config/retroarch/config/arcade
+  [ -d "/var/cache/retroarch/$corename" ] && mv /var/cache/retroarch/$corename /etc/libretro/.config/retroarch/config/arcade
 fi
 rm -rf /var/cache/retroarch/
 

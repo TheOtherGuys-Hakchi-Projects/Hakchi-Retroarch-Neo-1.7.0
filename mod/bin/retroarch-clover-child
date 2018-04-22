@@ -21,10 +21,8 @@ clovercon_file=/dev/clovercon1
 logend="_RetroArch.log"
 shift 2
 
-if [[ $corename = *"prboom"* ]]; then
-  if [[ $corename = *"tyrquake"* ]]; then
-    umount "$rootfs/share/retroarch/assets/RAloading-min.png"
-  fi
+if ! echo $corename | grep "prboom\|tyrquake"; then
+  umount "$rootfs/share/retroarch/assets/RAloading-min.png"
 fi
 
 if [ ! -z "$custom_loadscreen" ]; then

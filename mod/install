@@ -7,18 +7,17 @@ mkdir -p $rootfs/etc/options_menu/retroarch/default_files
 copy $rootfs/etc/libretro/retroarch.cfg $rootfs/etc/options_menu/retroarch/default_files/
 copy $rootfs/etc/libretro/retroarch-core-options.cfg $rootfs/etc/options_menu/retroarch/default_files/
 loadscr_path=$rootfs/share/retroarch/assets/core_loading_screens
-lnloadscr_path=/var/lib/hakchi/rootfs/share/retroarch/assets/core_loading_screens
 for arcade_loadscr in "$loadscr_path/fbalpha2012.png" "$loadscr_path/fbalpha2012_cps1.png" "$loadscr_path/fbalpha2012_cps2.png" "$loadscr_path/fbalpha2012_cps3.png" "$loadscr_path/fbalpha2012_neogeo.png" "$loadscr_path/fb_alpha.png" "$loadscr_path/mame2003.png" "$loadscr_path/mame2003_xtreme.png" "$loadscr_path/mame2010.png" "$loadscr_path/mame2014.png"; do
   if [ ! -e "$arcade_loadscr" ]; then
-    ln -s "$lnloadscr_path/mame2000.png" "$arcade_loadscr"
+    ln -s "$loadscr_path/mame2000.png" "$arcade_loadscr"
   fi
 done
 for snes_loadscr in "$loadscr_path/snes9x2002.png" "$loadscr_path/snes9x2005.png" "$loadscr_path/snes9x2010.png"; do
   if [ ! -e "$snes_loadscr" ]; then
-    ln -s "$lnloadscr_path/snes9x.png" "$snes_loadscr"
+    ln -s "$loadscr_path/snes9x.png" "$snes_loadscr"
   fi
 done
-[ ! -e "$loadscr_path/fceumm.png" ] && ln -s $lnloadscr_path/nestopia.png $loadscr_path/fceumm.png
-[ ! -e "$loadscr_path/mupen64plus.png" ] && ln -s $lnloadscr_path/glupen64.png $loadscr_path/mupen64plus.png
-[ ! -e "$loadscr_path/genesis_plus_gx.png" ] && ln -s $lnloadscr_path/picodrive.png $loadscr_path/genesis_plus_gx.png
+[ ! -e "$loadscr_path/fceumm.png" ] && ln -s $loadscr_path/nestopia.png $loadscr_path/fceumm.png
+[ ! -e "$loadscr_path/mupen64plus.png" ] && ln -s $loadscr_path/glupen64.png $loadscr_path/mupen64plus.png
+[ ! -e "$loadscr_path/genesis_plus_gx.png" ] && ln -s $loadscr_path/picodrive.png $loadscr_path/genesis_plus_gx.png
 return 1

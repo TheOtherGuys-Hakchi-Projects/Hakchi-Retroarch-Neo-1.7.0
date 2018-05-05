@@ -126,7 +126,7 @@ else
 fi
 [ "$filter" == "crt720" ] && [ ! -z "$no_scanlines" ] || [ ! "$filter" == "crt720" ] && overlay1=$frame.png && overlay2=
 retroarch_watchdog --configEdit /etc/libretro/.config/retroarch/overlay/default.cfg overlay0_overlay "$overlay1" overlay0_desc0_overlay "$overlay2"
-retroarch_watchdog --configEdit /etc/libretro/.config/retroarch/overlay/default_scanlines.cfg overlay0_desc0_overlay "$frame_scanlines.png"
+retroarch_watchdog --configEdit /etc/libretro/.config/retroarch/overlay/default_scanlines.cfg overlay0_desc0_overlay "$frame.png"
 
 ra_config_args=""
 # Functions to make the rest easier

@@ -25,20 +25,6 @@ if ! echo $corename | grep "prboom\|tyrquake"; then
   umount "$rootfs/share/retroarch/assets/RAloading-min.png"
 fi
 
-if [ ! -z "$custom_loadscreen" ]; then
-  decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
-else
-  if [ -f "$mountpoint/media/hakchi/RA_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-	  decodepng "$mountpoint/media/hakchi/RA_loading_screens/"$corename".png"  > /dev/fb0;
-  else
-    if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
-    else
-	  decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
-    fi
-  fi
-fi
-
 while [ $# -gt 0 ]; do
   [ "$1" == "--load-state-file" ] && load=$2
   [ "$1" == "--save-on-quit" ] && save=$2
@@ -67,6 +53,21 @@ while [ $# -gt 0 ]; do
   [ "$1" == "--custom-loadscreen" ] && custom_loadscreen=$2
   shift
 done
+
+# Display Splash Screen
+if [ ! -z "$custom_loadscreen" ]; then
+  decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
+else
+  if [ -f "$mountpoint/media/hakchi/RA_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+	  decodepng "$mountpoint/media/hakchi/RA_loading_screens/"$corename".png"  > /dev/fb0;
+  else
+    if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
+    else
+	  decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
+    fi
+  fi
+fi
 
 [ -z "$timefile_save" ] && timefile_save=$load$t_suffix
 [ -z "$timefile_load" ] && timefile_load=$load$t_suffix
@@ -98,21 +99,6 @@ else
   [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsram"
 fi
 
-#Refresh the framebuffer incase there is some left over FB process
-if [ ! -z "$custom_loadscreen" ]; then
-  decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
-else
-  if [ -f "$mountpoint/media/hakchi/RA_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-	  decodepng "$mountpoint/media/hakchi/RA_loading_screens/"$corename".png"  > /dev/fb0;
-  else
-    if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
-    else
-	  decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
-    fi
-  fi
-fi
-
 # Hold L button while starting a game to toggle bezel-mode for this game
 if [ -e "$clovercon_file" ] && [ "$(cat $clovercon_file)" == "0004" ]; then
   if [ "$bezel_mode" == "0" ]; then
@@ -133,9 +119,6 @@ if [ -e "$clovercon_file" ] && [ "$(cat $clovercon_file)" == "0008" ]; then
 fi
 
 # Smooth, border and scanlines
-[ "$filter" == "crt720" ] && set_smooth=1
-[ "$filter" == "crt720" ] && [ ! -z "$no_smooth" ] && set_smooth=0
-[ "$filter" == "gpu720" ] && [ ! -z "$smooth43" ] && set_smooth=1
 if [ "$bezel_mode" == "1" ]; then
   [ "$filter" == "crt720" ] && overlay1=scanlines.png && overlay2=$frame.png
 else
@@ -145,45 +128,34 @@ fi
 overlay1=$(echo "$overlay1" | sed 's/\//\\\//g')
 overlay2=$(echo "$overlay2" | sed 's/\//\\\//g')
 frame_scanlines=$(echo "$frame" | sed 's/\//\\\//g')
-sed -i -e 's/overlay0_overlay = "[^"]*"/overlay0_overlay = "'$overlay1'"/g' /etc/libretro/.config/retroarch/overlay/default.cfg
-sed -i -e 's/overlay0_desc0_overlay = "[^"]*"/overlay0_desc0_overlay = "'$overlay2'"/g' /etc/libretro/.config/retroarch/overlay/default.cfg
-sed -i -e 's/overlay0_desc0_overlay = "[^"]*"/overlay0_desc0_overlay = "'$frame_scanlines'.png"/g' /etc/libretro/.config/retroarch/overlay/default_scanlines.cfg
+retroarch_watchdog --configEdit /etc/libretro/.config/retroarch/overlay/default.cfg overlay0_overlay "$overlay1" overlay0_desc0_overlay "$overlay2"
+retroarch_watchdog --configEdit /etc/libretro/.config/retroarch/overlay/default_scanlines.cfg overlay0_desc0_overlay "$frame_scanlines.png"
 
+ra_config_args=""
 # Functions to make the rest easier
-smooth () { sed -i -e 's/video_smooth = "[^"]*"/video_smooth = "'$1'"/g' /etc/libretro/retroarch.cfg; }
-overlay () { sed -i -e 's/input_overlay_enable = "[^"]*"/input_overlay_enable = "'$1'"/g' /etc/libretro/retroarch.cfg; }
-overlay_file () { sed -i -e 's/input_overlay = "~\/\.config\/retroarch\/overlay\/[^"]*"/input_overlay = "~\/\.config\/retroarch\/overlay\/'$1'"/g' /etc/libretro/retroarch.cfg; }
-int_scale () { sed -i -e 's/video_scale_integer = "[^"]*"/video_scale_integer = "'$1'"/g' /etc/libretro/retroarch.cfg; }
-ratio () { sed -i -e 's/aspect_ratio_index = "[^"]*"/aspect_ratio_index = "'$1'"/g' /etc/libretro/retroarch.cfg; }
-width () { sed -i -e 's/custom_viewport_width = "[^"]*"/custom_viewport_width = "'$1'"/g' /etc/libretro/retroarch.cfg; }
-height () { sed -i -e 's/custom_viewport_height = "[^"]*"/custom_viewport_height = "'$1'"/g' /etc/libretro/retroarch.cfg; }
-posx () { sed -i -e 's/custom_viewport_x = "[^"]*"/custom_viewport_x = "'$1'"/g' /etc/libretro/retroarch.cfg; }
-posy () { sed -i -e 's/custom_viewport_y = "[^"]*"/custom_viewport_y = "'$1'"/g' /etc/libretro/retroarch.cfg; }
+smooth () { ra_config_args="$ra_config_args video_smooth $1"; }
+overlay () { ra_config_args="$ra_config_args input_overlay_enable $1"; }
+overlay_file () { ra_config_args="$ra_config_args input_overlay ~/.config/retroarch/overlay/$1"; }
+int_scale () { ra_config_args="$ra_config_args video_scale_integer $1"; }
+ratio () { ra_config_args="$ra_config_args aspect_ratio_index $1"; }
+width () { ra_config_args="$ra_config_args custom_viewport_width $1"; }
+height () { ra_config_args="$ra_config_args custom_viewport_height $1"; }
+posx () { ra_config_args="$ra_config_args custom_viewport_x $1"; }
+posy () { ra_config_args="$ra_config_args custom_viewport_y $1"; }
 
 # Smooth and bezel-mode
-grep "video_smooth = " /etc/libretro/retroarch.cfg | grep true && current_smooth=true || current_smooth=false
-grep "input_overlay_enable = " /etc/libretro/retroarch.cfg | grep true && current_overlay=true || current_overlay=false
 if [ "$bezel_mode" == "1" ]; then
-  grep "video_scale_integer = " /etc/libretro/retroarch.cfg | grep true && current_int=true || current_int=false
-  current_overcfg=$(grep "input_overlay = " /etc/libretro/retroarch.cfg | grep -o "[^/]*cfg")
-  current_ratio=$(grep "aspect_ratio_index = " /etc/libretro/retroarch.cfg | sed 's/[^0-9]*//g')
-  current_width=$(grep "custom_viewport_width = " /etc/libretro/retroarch.cfg | sed 's/[^0-9]*//g')
-  current_height=$(grep "custom_viewport_height = " /etc/libretro/retroarch.cfg | sed 's/[^0-9]*//g')
-  current_posx=$(grep "custom_viewport_x = " /etc/libretro/retroarch.cfg | sed 's/[^0-9]*//g')
-  current_posy=$(grep "custom_viewport_y = " /etc/libretro/retroarch.cfg | sed 's/[^0-9]*//g')
   [ "$filter" == "crt720" ] && width 877 && posx 201
   [ "$filter" == "gpu720" ] && smooth false && width 877 && posx 201
   [ "$filter" == "ppu" ] && smooth false && width 768 && posx 256
   ratio 22 && overlay true && overlay_file default.cfg && height 672 && posy 24 && int_scale true
 fi
 [ "$filter" == "crt720" ] && overlay true
-[ "$set_smooth" == "0" ] && smooth false
-[ "$set_smooth" == "1" ] && smooth true
+[ "$filter" == "crt720" ] && [ -z "$no_smooth" ] && smooth true
+[ "$filter" == "crt720" ] && [ ! -z "$no_smooth" ] && smooth false
+[ "$filter" == "gpu720" ] && [ ! -z "$smooth43" ] && smooth true
 
-# Start timestamp
-ts=$(date +"%s")
-tm=0
-[ -f "$timefile_load" ] && tm=$(cat "$timefile_load")
+[ ! -z "$ra_config_args" ] && retroarch_watchdog --configEdit /etc/libretro/retroarch.cfg $ra_config_args
 
 # Clear Caches/Buffers
 sync
@@ -215,6 +187,9 @@ fi
 if [ ! -z "$screenshot" ] && [ -z "$nosaves" ]; then
   watchdog_args="$watchdog_args --screenshot "$screenshot""
 fi
+# Load Time Played
+[ -f "$timefile_load" ] && watchdog_args="$watchdog_args --time $(cat "$timefile_load")"
+[ -z "$demo" ] && watchdog_args="$watchdog_args --timePath "$timefile_save""
 
 # Run retroarch watchdog
 retroarch_watchdog $watchdog_args
@@ -227,24 +202,8 @@ else
   [ ! -z "$sram" ] && [ -f "$rsram" ] && mv -f "$rsram" "$sram"
 fi
 
-# Time
-ts2=$(date +"%s")
-tm=$((tm + ts2 - ts))
-echo $tm > "$timefile_save"
-
-# Restore settings if needed
-[ ! -z "$set_smooth" ] || [ "$bezel_mode" == "1" ] && sed -i -e 's/video_smooth = "[^"]*"/video_smooth = "'$current_smooth'"/g' /etc/libretro/retroarch.cfg
-[ "$filter" == "crt720" ] && sed -i -e 's/input_overlay_enable = "[^"]*"/input_overlay_enable = "'$current_overlay'"/g' /etc/libretro/retroarch.cfg
-if [ "$bezel_mode" == "1" ]; then
-  sed -i -e 's/input_overlay_enable = "[^"]*"/input_overlay_enable = "'$current_overlay'"/g' /etc/libretro/retroarch.cfg
-  sed -i -e 's/input_overlay = "~\/\.config\/retroarch\/overlay\/[^"]*"/input_overlay = "~\/\.config\/retroarch\/overlay\/'$current_overcfg'"/g' /etc/libretro/retroarch.cfg
-  sed -i -e 's/video_scale_integer = "[^"]*"/video_scale_integer = "'$current_int'"/g' /etc/libretro/retroarch.cfg
-  sed -i -e 's/aspect_ratio_index = "[^"]*"/aspect_ratio_index = "'$current_ratio'"/g' /etc/libretro/retroarch.cfg
-  sed -i -e 's/custom_viewport_width = "[^"]*"/custom_viewport_width = "'$current_width'"/g' /etc/libretro/retroarch.cfg
-  sed -i -e 's/custom_viewport_height = "[^"]*"/custom_viewport_height = "'$current_height'"/g' /etc/libretro/retroarch.cfg
-  sed -i -e 's/custom_viewport_x = "[^"]*"/custom_viewport_x = "'$current_posx'"/g' /etc/libretro/retroarch.cfg
-  sed -i -e 's/custom_viewport_y = "[^"]*"/custom_viewport_y = "'$current_posy'"/g' /etc/libretro/retroarch.cfg
-fi
+# Restore Retroarch Config
+retroarch_watchdog --configRestore /etc/libretro/retroarch.cfg
 
 # Copy savestates to USB if any, move mame cfg files in retroarch config folder if any and remove cache folder
 if [ -d "/media/hakchi" ] && ls /var/cache/retroarch/$id.*[^auto]; then

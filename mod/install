@@ -1,3 +1,6 @@
+echo "Uninstalling old version of Hakchi RetroArch neo..."
+var=$(hakchi pack_list | grep "Hakchi_Retroarch_Neo_") && hakchi pack_uninstall $var
+echo "Uninstalled $var, Installing new version now."
 transfer_default
 chmod +x $rootfs/bin/*
 chmod +x $rootfs/usr/bin/*

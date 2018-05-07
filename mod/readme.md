@@ -1,5 +1,5 @@
 -----------------------
-Name: RetroArch Neo 1.7.2a
+Name: RetroArch Neo 1.7.3a
 Creator: TheOtherGuys
 Category: RetroArch
 -----------------------
@@ -12,47 +12,21 @@ RetroArch Neo allows you to add libretro cores to your NESC & SNESC to allow you
 
 # What's new in this release?
 
-## Core Specifc load screens
+-Built with preconfigured network and achievement support. (As soon as network connection is available, network and achievements are enabled.)
+-New RetroArch binary 1.7.3 (completely overhauled audio mixer)
+-Few RA bug fixes
+-Default GUI is now changed to XMB with the purpose of using network and achievements.
+-A few mapping issues Fixed for keyboard to gamepad
+-Saves mame config properly (dip switches, etc.)
+-Optimizations to avoid to many writes on NAND
+-Boot sequence optimised
+-Doom and Quake splash screen bug fixed.
 
-* By Default RA neo will display core specific load screens that are bundled into RetroArch `Neo`
-* You can load in your own core specific load screens by putting the load screens on your usb `USB:/hakchi/RA_loading_screens/CORENAME.png` or directly to nand `$rootfs/share/retroarch/assets/core_loading_screens/`
-* You can add additional core specific core screens by adding the `Core name`.png to to the folders. i.e. `ppsspp.png`
+## Network Support and Retro Achievement support
 
-## Save states:
+In this build we tried to tailor it around the recent addition of the wifi network mod. If you have wifi enabled, the achievements and net play are automatically enabled.
 
-* RetroArch save states now works properly **for the most part**.
-* Because it can quickly take A LOT of space on NAND and there is no "user friendly" of managing them yet, this is only compatible with USB-HOST.
-* Not every core have been tested, and some doesnt like save states, e.g. with Super Mario 64, save states make the game crash when running with Glupen64 but works fine with Mupen64Plus.
-* Save states are stored in `usb:\data\ra_savestates`.
-* Open RetroArch menu and go to `Quick Menu` then click `Save/Load State`, you can have multiple save states for on game by changing the `Save Slot`.
-* You can assign shortcuts if you want for quick save/load in `Settings > Input > Input Hotkey Binds`, e.g. you can assign L to `Save state`, R to `Load state` and Select to `Enable hotkeys`, this way holding Select and pressing L or R will save or load your save state.
-
-## Remaps:
-
-* You can now remap almost anything in `Quick Menu > Controls`, so for example if you want to remap the analog stick on a N64 core to the dpad of your SNESC controller you can do it directly from here and create a core/game remap file.
-* The hotkeys/rebinds in `Settings > Input` still reset when using core/game override but this shouldnt be an issue anymore since you can just use the `Quick Menu > Controls` menu.
-* If you already have an override and want to make a global change in `Settings > Input` just use CloverApp or load a game then select `Quick Menu > Close Content`, make your changes then quit or select `Configurations > Save Current Configuration`.
-* You can now also unbind buttons in `Quick Menu > Controls`, just scroll until you see `---`.
-
-## Default settings, cfg and scanlines:
-
-* By default the games will start in `Core Provided` aspect ratio and without border.
-* Scanlines and bilinear are ON if CRT mode is selected.
-* To enable border go to `Settings > Onscreen Display > Onscreen Overlay` and turn ON `Display Overlay`.
-* To enable scanlines while in 4:3 or Pixel perfect mode go to `Settings > Onscreen Display > Onscreen Overlay > Overlay Preset` and select `scanlines.cfg` (scanlines only) or `default_scanlines.cfg` (scanlines + SNESC border).
-* Add `--no-smooth` to the command line to disable bilinear in CRT mode, `--no-scanlines` to disable scanlines in CRT mode or `--smooth43` to enable bilinear in 4:3 mode.
-
-## Bezel-mode:
-
-* Bezel-mode is a mode that enables your current selected SNESC border and fit automatically the image of the game inside:  
--CRT mode: 877x672, scanlines ON, bilinear ON.  
--4:3 mode: 877x672.  
--Pixel perfect: 768x672.
-
-* There are 3 ways of enabling bezel-mode:  
--Add `--bezel-mode` in the command line.  
--Hold L button while starting a game to enable the mode for this specific game (it is a toggle, start the game again with L to disable the mode).  
--Hold R button while starting a game to enable the mode for EVERY game (again, it is a toggle).
+The achievements are currently hooked up to a global public bucket account. You can either disable achievements or create your own account with [RetroAchivements](http://retroachievements.org/) and put your own details in.
 
 This pack already contains the following cores:
 

@@ -12,15 +12,15 @@ RetroArch Neo allows you to add libretro cores to your NESC & SNESC to allow you
 
 # What's new in this release?
 
--Built with preconfigured network and achievement support. (As soon as network connection is available, network and achievements are enabled.)
--New RetroArch binary 1.7.3 (completely overhauled audio mixer)
--Few RA bug fixes
--Default GUI is now changed to XMB with the purpose of using network and achievements.
--A few mapping issues Fixed for keyboard to gamepad
--Saves mame config properly (dip switches, etc.)
--Optimizations to avoid to many writes on NAND
--Boot sequence optimised
--Doom and Quake splash screen bug fixed.
+* Built with preconfigured network and achievement support. (As soon as network connection is available, network and achievements are enabled.)
+* New RetroArch binary 1.7.3 (completely overhauled audio mixer)
+* Few RA bug fixes
+* Default GUI is now changed to XMB with the purpose of using network and achievements.
+* A few mapping issues Fixed for keyboard to gamepad
+* Saves mame config properly (dip switches, etc.)
+* Optimizations to avoid to many writes on NAND
+* Boot sequence optimised
+* Doom and Quake splash screen bug fixed.
 
 ## Network Support and Retro Achievement support
 

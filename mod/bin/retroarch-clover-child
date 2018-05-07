@@ -5,6 +5,7 @@ script_init
 
 HOME=/etc/libretro
 corename=$1
+noprefix=${corename#km_}
 core=$HOME/core/$1_libretro.so
 rom=$2
 filename=$(basename "$rom")
@@ -58,11 +59,11 @@ done
 if [ ! -z "$custom_loadscreen" ]; then
   decodepng "$rootfs/share/retroarch/assets/$custom_loadscreen" > /dev/fb0;
 else
-  if [ -f "$mountpoint/media/hakchi/RA_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-	  decodepng "$mountpoint/media/hakchi/RA_loading_screens/"$corename".png"  > /dev/fb0;
+  if [ -f "$mountpoint/media/hakchi/RA_loading_screens/"$noprefix".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+	  decodepng "$mountpoint/media/hakchi/RA_loading_screens/"$noprefix".png"  > /dev/fb0;
   else
-    if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
-	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$corename".png"  > /dev/fb0;
+    if [ -f "$rootfs/share/retroarch/assets/core_loading_screens/"$noprefix".png" ] && [ -f "$rootfs/share/retroarch/assets/RAloading-min.png" ]; then
+	  decodepng "$rootfs/share/retroarch/assets/core_loading_screens/"$noprefix".png"  > /dev/fb0;
     else
 	  decodepng "$rootfs/share/retroarch/assets/RAloading-min.png" > /dev/fb0;
     fi
@@ -74,13 +75,16 @@ fi
 
 [ ! -z "$demo" ] && load=$(dirname $load)/savestate
 
-# Create cache folder, copy savestates from USB if any and move mame cfg files to cache if any
+# Create cache folder and copy savestates from USB if any
 mkdir -p /var/cache/retroarch/
 if [ -d "/media/hakchi" ] && ls /media/data/ra_savestates/$title_code/$id.state*; then
   cp /media/data/ra_savestates/$title_code/$id.state* /var/cache/retroarch
 fi
+
+# Overmount for mame config files (${noprefix%%_*} are for cores like mame2003_xtreme)
 if echo $corename | grep mame; then
-  [ -d "/etc/libretro/.config/retroarch/config/arcade/$corename" ] && mv /etc/libretro/.config/retroarch/config/arcade/$corename /var/cache/retroarch
+  [ ! -d "/etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*}" ] && mkdir -p /etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*}
+  mkdir -p /var/cache/retroarch/${noprefix%%_*} && mount_bind /etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*} /var/cache/retroarch/${noprefix%%_*}
 fi
 
 # saves if any
@@ -202,15 +206,14 @@ fi
 # Restore Retroarch Config
 retroarch_watchdog --configRestore /etc/libretro/retroarch.cfg
 
-# Copy savestates to USB if any, move mame cfg files in retroarch config folder if any and remove cache folder
+# Copy savestates to USB if any
 if [ -d "/media/hakchi" ] && ls /var/cache/retroarch/$id.*[^auto]; then
   [ ! -d "/media/data/ra_savestates/$title_code" ] && mkdir -p /media/data/ra_savestates/$title_code
   cp /var/cache/retroarch/$id.*[^auto] /media/data/ra_savestates/$title_code
 fi
-if echo $corename | grep mame; then
-  [ ! -d "/etc/libretro/.config/retroarch/config/arcade" ] && mkdir -p /etc/libretro/.config/retroarch/config/arcade
-  [ -d "/var/cache/retroarch/$corename" ] && mv /var/cache/retroarch/$corename /etc/libretro/.config/retroarch/config/arcade
-fi
+
+# Unmount mame config files and remove cache folder
+mountpoint /var/cache/retroarch/${noprefix%%_*} && umount /var/cache/retroarch/${noprefix%%_*}
 rm -rf /var/cache/retroarch/
 
 # Clear Caches/Buffers

@@ -86,6 +86,10 @@ if echo $corename | grep mame; then
   [ ! -d "/etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*}" ] && mkdir -p /etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*}
   mkdir -p /var/cache/retroarch/${noprefix%%_*} && mount_bind /etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*} /var/cache/retroarch/${noprefix%%_*}
 fi
+if echo $corename | grep fbalpha; then
+  [ ! -d "/etc/libretro/.config/retroarch/config/arcade/fba" ] && mkdir -p /etc/libretro/.config/retroarch/config/arcade/fba
+  mkdir -p /var/cache/retroarch/fba && mount_bind /etc/libretro/.config/retroarch/config/arcade/fba /var/cache/retroarch/fba
+fi
 
 # saves if any
 if [ ! -z "$load" ] && [ -f "$load" ] && [ -z "$nosaves" ]; then
@@ -214,6 +218,7 @@ fi
 
 # Unmount mame config files and remove cache folder
 mountpoint /var/cache/retroarch/${noprefix%%_*} && umount /var/cache/retroarch/${noprefix%%_*}
+mountpoint /var/cache/retroarch/fba && umount /var/cache/retroarch/fba
 rm -rf /var/cache/retroarch/
 
 # Clear Caches/Buffers

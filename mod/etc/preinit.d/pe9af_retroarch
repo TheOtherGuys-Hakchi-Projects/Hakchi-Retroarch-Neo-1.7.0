@@ -1,8 +1,8 @@
 [ -f "$mountpoint/usr/bin/clover-kachikachi" ] && overmount /usr/bin/clover-kachikachi
 [ -f "$mountpoint/usr/bin/clover-canoe-shvc" ] && overmount /usr/bin/clover-canoe-shvc
-[ -f "$rootfs/bin/snes" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes" "$rootfs/bin/snes"
-[ -f "$rootfs/bin/snes9x" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes9x" "$rootfs/bin/snes9x"
-[ -f "$rootfs/bin/snes02" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes02" "$rootfs/bin/snes02"
-[ -f "$rootfs/bin/snes05" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes05" "$rootfs/bin/snes05"
-[ -f "$rootfs/bin/snes10" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes10" "$rootfs/bin/snes10"
-[ -f "$rootfs/bin/snes16" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes16" "$rootfs/bin/snes16"
+[ -f "$rootfs/bin/snes" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes" "/bin/snes"
+[ -f "$rootfs/bin/snes9x" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes9x" "/bin/snes9x"
+[ -f "$rootfs/bin/snes02" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes02" "/bin/snes02"
+[ -f "$rootfs/bin/snes05" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes05" "/bin/snes05"
+[ -f "$rootfs/bin/snes10" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes10" "/bin/snes10"
+[ -f "$rootfs/bin/snes16" ] && mount_bind "$rootfs/etc/libretro/sform_binaries/snes16" "/bin/snes16"

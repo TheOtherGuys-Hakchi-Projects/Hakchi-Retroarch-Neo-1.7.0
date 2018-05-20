@@ -11,9 +11,9 @@ rom=$2
 filename=$(basename "$rom")
 id=${filename%.*}
 extension="${filename##*.}"
-autosave="/var/cache/retroarch/$id.state.auto"
-rsram="/var/cache/retroarch/$id.srm"
-rsav="/var/cache/retroarch/$id.sav"
+autosave="/etc/libretro/states/$id.state.auto"
+rsram="/etc/libretro/saves/$id.srm"
+rsav="/etc/libretro/saves/$id.sav"
 t_suffix=_time.txt
 demo_time=30
 debug=0
@@ -75,17 +75,9 @@ fi
 
 [ ! -z "$demo" ] && load=$(dirname $load)/savestate
 
-# Create cache folder and copy savestates from USB if any
+# Create cache folder and overmount savestates folder if it exists on USB
 mkdir -p /var/cache/retroarch/
-if [ -d "/media/hakchi" ] && ls /media/data/ra_savestates/$title_code/$id.state*; then
-  cp /media/data/ra_savestates/$title_code/$id.state* /var/cache/retroarch
-fi
-
-# Overmount for mame config files (${noprefix%%_*} are for cores like mame2003_xtreme)
-if echo $corename | grep mame; then
-  [ ! -d "/etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*}" ] && mkdir -p /etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*}
-  mkdir -p /var/cache/retroarch/${noprefix%%_*} && mount_bind /etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*} /var/cache/retroarch/${noprefix%%_*}
-fi
+[ -d "/media/data/ra_savestates" ] && mount_bind "/media/data/ra_savestates" "/etc/libretro/states"
 
 # saves if any
 if [ ! -z "$load" ] && [ -f "$load" ] && [ -z "$nosaves" ]; then
@@ -99,6 +91,8 @@ fi
 # Nestopia names FDS saves as $id.sav, so here's a quick fix
 if [ "$corename" == "nestopia" ] && [ "$extension" == "fds" ]; then
   [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsav"
+elif [ "$corename" == "genesis_plus_gx" ] && [ -f "/var/lib/clover/profiles/0/$title_code/$id.brm" ]; then
+  cp -f /var/lib/clover/profiles/0/$title_code/$id.brm /etc/libretro/saves
 else
   [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsram"
 fi
@@ -199,6 +193,8 @@ retroarch_watchdog $watchdog_args
 [ ! -z "$save" ] && [ -f "$autosave" ] && [ -z "$nosaves" ] && gzip -f "$autosave" && mv -f "$autosave.gz" "$save"
 if [ "$corename" == "nestopia" ] && [ "$extension" == "fds" ]; then
   [ ! -z "$sram" ] && [ -f "$rsav" ] && mv -f "$rsav" "$sram"
+elif [ "$corename" == "genesis_plus_gx" ] && [ -f "/etc/libretro/saves/$id.brm" ]; then
+  mv -f /etc/libretro/saves/$id.brm /var/lib/clover/profiles/0/$title_code
 else
   [ ! -z "$sram" ] && [ -f "$rsram" ] && mv -f "$rsram" "$sram"
 fi
@@ -206,14 +202,8 @@ fi
 # Restore Retroarch Config
 retroarch_watchdog --configRestore /etc/libretro/retroarch.cfg
 
-# Copy savestates to USB if any
-if [ -d "/media/hakchi" ] && ls /var/cache/retroarch/$id.*[^auto]; then
-  [ ! -d "/media/data/ra_savestates/$title_code" ] && mkdir -p /media/data/ra_savestates/$title_code
-  cp /var/cache/retroarch/$id.*[^auto] /media/data/ra_savestates/$title_code
-fi
-
-# Unmount mame config files and remove cache folder
-mountpoint /var/cache/retroarch/${noprefix%%_*} && umount /var/cache/retroarch/${noprefix%%_*}
+# Unmount savestates folder if mounted and remove cache folder
+mountpoint /etc/libretro/states && umount /etc/libretro/states
 rm -rf /var/cache/retroarch/
 
 # Clear Caches/Buffers

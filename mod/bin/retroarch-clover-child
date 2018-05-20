@@ -166,15 +166,22 @@ fi
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-if [ "$debug" == "0" ]; then #Default
-  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra &
-fi 
-if [ "$debug" == "1" ]; then #Verbose USB mode
-  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/"$filename"_RetroArch.log 2>&1 &
-fi 
-if [ "$debug" == "2" ]; then #Verbose NAND mode
-  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /tmp/"$filename"_RetroArch.log 2>&1 &
-fi 
+if [ -f "/media/RA_DEV_MODE" ]; then #Devmode Active (Record current session)
+  rm -f /media/Development_RetroArch.log
+  echo "Pre RA load Core Temp: " $(more /sys/devices/virtual/thermal/thermal_zone0/temp) >> /media/Development_RA_temp.log
+  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/Development_RetroArch.log 2>&1 &
+else
+  if [ "$debug" == "0" ]; then #Default
+    retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra &
+  fi 
+  if [ "$debug" == "1" ]; then #Verbose USB mode
+    retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/"$filename"_RetroArch.log 2>&1 &
+  fi 
+  if [ "$debug" == "2" ]; then #Verbose NAND mode
+    retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /tmp/"$filename"_RetroArch.log 2>&1 &
+  fi 
+fi
+
 rpid=$!
 
 [ ! -z "$save" ] && mkdir -p $(dirname "$save")
@@ -220,6 +227,10 @@ fi
 mountpoint /var/cache/retroarch/${noprefix%%_*} && umount /var/cache/retroarch/${noprefix%%_*}
 mountpoint /var/cache/retroarch/fba && umount /var/cache/retroarch/fba
 rm -rf /var/cache/retroarch/
+
+if [ -f "/media/RA_DEV_MODE" ]; then #Devmode Active (Record current session)
+  echo "Post RA load Core Temp: " $(more /sys/devices/virtual/thermal/thermal_zone0/temp) >> /media/Development_RA_temp.log
+fi
 
 # Clear Caches/Buffers
 sync

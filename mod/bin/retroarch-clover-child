@@ -100,8 +100,14 @@ if [ ! -z "$load" ] && [ -f "$load" ] && [ -z "$nosaves" ]; then
     cp -f "$load" "$autosave"
   fi
 fi
-# Nestopia names FDS saves as $id.sav, so here's a quick fix
+# Nestopia names FDS saves as $id.sav, so here's a quick fix, gpSP also uses .sav extension. Genesis Plus GX uses .brm for Sega CD games.
+brm="/var/lib/clover/profiles/0/$title_code/$id.brm"
+rbrm="/var/cache/retroarch/$id.brm"
 if [ "$corename" == "nestopia" ] && [ "$extension" == "fds" ]; then
+  [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsav"
+elif [ "$noprefix" == "genesis_plus_gx" ] && [ -f "$brm" ]; then
+  cp -f "$brm" "$rbrm"
+elif [ "$noprefix" == "gpsp" ]; then
   [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsav"
 else
   [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsram"
@@ -209,6 +215,10 @@ retroarch_watchdog $watchdog_args
 # Saves!
 [ ! -z "$save" ] && [ -f "$autosave" ] && [ -z "$nosaves" ] && gzip -f "$autosave" && mv -f "$autosave.gz" "$save"
 if [ "$corename" == "nestopia" ] && [ "$extension" == "fds" ]; then
+  [ ! -z "$sram" ] && [ -f "$rsav" ] && mv -f "$rsav" "$sram"
+elif [ "$noprefix" == "genesis_plus_gx" ] && [ -f "$rbrm" ]; then
+  mv -f "$rbrm" "$brm"
+elif [ "$noprefix" == "gpsp" ]; then
   [ ! -z "$sram" ] && [ -f "$rsav" ] && mv -f "$rsav" "$sram"
 else
   [ ! -z "$sram" ] && [ -f "$rsram" ] && mv -f "$rsram" "$sram"

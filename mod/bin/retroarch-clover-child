@@ -86,6 +86,10 @@ if echo $corename | grep mame; then
   [ ! -d "/etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*}" ] && mkdir -p /etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*}
   mkdir -p /var/cache/retroarch/${noprefix%%_*} && mount_bind /etc/libretro/.config/retroarch/config/arcade/${noprefix%%_*} /var/cache/retroarch/${noprefix%%_*}
 fi
+if echo $corename | grep fbalpha; then
+  [ ! -d "/etc/libretro/.config/retroarch/config/arcade/fba" ] && mkdir -p /etc/libretro/.config/retroarch/config/arcade/fba
+  mkdir -p /var/cache/retroarch/fba && mount_bind /etc/libretro/.config/retroarch/config/arcade/fba /var/cache/retroarch/fba
+fi
 
 # saves if any
 if [ ! -z "$load" ] && [ -f "$load" ] && [ -z "$nosaves" ]; then
@@ -96,8 +100,14 @@ if [ ! -z "$load" ] && [ -f "$load" ] && [ -z "$nosaves" ]; then
     cp -f "$load" "$autosave"
   fi
 fi
-# Nestopia names FDS saves as $id.sav, so here's a quick fix
+# Nestopia names FDS saves as $id.sav, so here's a quick fix, gpSP also uses .sav extension. Genesis Plus GX uses .brm for Sega CD games.
+brm="/var/lib/clover/profiles/0/$title_code/$id.brm"
+rbrm="/var/cache/retroarch/$id.brm"
 if [ "$corename" == "nestopia" ] && [ "$extension" == "fds" ]; then
+  [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsav"
+elif [ "$noprefix" == "genesis_plus_gx" ] && [ -f "$brm" ]; then
+  cp -f "$brm" "$rbrm"
+elif [ "$noprefix" == "gpsp" ]; then
   [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsav"
 else
   [ ! -z "$sram" ] && [ -f "$sram" ] && cp -f "$sram" "$rsram"
@@ -106,21 +116,21 @@ fi
 # Hold L button while starting a game to toggle bezel-mode for this game
 if [ -e "$clovercon_file" ] && [ "$(cat $clovercon_file)" == "0004" ]; then
   if [ "$bezel_mode" == "0" ]; then
-    sed -i 's/^Exec.*/& --bezel-mode/' /usr/share/games/$title_code/$title_code.desktop && bezel_mode=1
+    sed -i 's/^Exec.*/& --bezel-mode/' $gamepath/$title_code/$title_code.desktop && bezel_mode=1
   else
-    sed -i 's/ --bezel-mode//g' /usr/share/games/$title_code/$title_code.desktop && bezel_mode=0
+    sed -i 's/ --bezel-mode//g' $gamepath/$title_code/$title_code.desktop && bezel_mode=0
   fi
 fi
-# Hold R button while starting a game to toggle global bezel-mode (games with --bezel-mode will still run in bezel-mode)
+# Hold R button while starting a game to toggle bezel-mode for this core
 if [ -e "$clovercon_file" ] && [ "$(cat $clovercon_file)" == "0008" ]; then
-  grep "^bezel_mode=" /bin/retroarch-clover-child | grep "0" && global_bezel=0 || global_bezel=1
-  if [ "$global_bezel" == "0" ]; then
-    sed -i 's/^bezel_mode=0/bezel_mode=1/' /bin/retroarch-clover-child && bezel_mode=1
+  [ ! -f "$HOME/bezel-core" ] && touch $HOME/bezel-core
+  if cat $HOME/bezel-core | grep ^$corename$; then
+    sed -i '/^'$corename'$/d' $HOME/bezel-core
   else
-    sed -i 's/^bezel_mode=1/bezel_mode=0/' /bin/retroarch-clover-child && bezel_mode=0
-	grep "^Exec=" /usr/share/games/$title_code/$title_code.desktop | grep bezel-mode && bezel_mode=1
+    echo $corename >> $HOME/bezel-core
   fi
 fi
+[ -f "$HOME/bezel-core" ] && cat $HOME/bezel-core | grep ^$corename$ && bezel_mode=1
 
 # Smooth, border and scanlines
 if [ "$bezel_mode" == "1" ]; then
@@ -162,15 +172,22 @@ fi
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
-if [ "$debug" == "0" ]; then #Default
-  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra &
-fi 
-if [ "$debug" == "1" ]; then #Verbose USB mode
-  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/"$filename"_RetroArch.log 2>&1 &
-fi 
-if [ "$debug" == "2" ]; then #Verbose NAND mode
-  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /tmp/"$filename"_RetroArch.log 2>&1 &
-fi 
+if [ -f "/media/RA_DEV_MODE" ]; then #Devmode Active (Record current session)
+  rm -f /media/Development_RetroArch.log
+  echo "Pre RA load Core Temp: " $(more /sys/devices/virtual/thermal/thermal_zone0/temp) >> /media/Development_RA_temp.log
+  retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/Development_RetroArch.log 2>&1 &
+else
+  if [ "$debug" == "0" ]; then #Default
+    retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra &
+  fi 
+  if [ "$debug" == "1" ]; then #Verbose USB mode
+    retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /media/"$filename"_RetroArch.log 2>&1 &
+  fi 
+  if [ "$debug" == "2" ]; then #Verbose NAND mode
+    retroarch -c "$HOME/retroarch.cfg" -vfL "$core" "$rom" $extra > /tmp/"$filename"_RetroArch.log 2>&1 &
+  fi 
+fi
+
 rpid=$!
 
 [ ! -z "$save" ] && mkdir -p $(dirname "$save")
@@ -199,6 +216,10 @@ retroarch_watchdog $watchdog_args
 [ ! -z "$save" ] && [ -f "$autosave" ] && [ -z "$nosaves" ] && gzip -f "$autosave" && mv -f "$autosave.gz" "$save"
 if [ "$corename" == "nestopia" ] && [ "$extension" == "fds" ]; then
   [ ! -z "$sram" ] && [ -f "$rsav" ] && mv -f "$rsav" "$sram"
+elif [ "$noprefix" == "genesis_plus_gx" ] && [ -f "$rbrm" ]; then
+  mv -f "$rbrm" "$brm"
+elif [ "$noprefix" == "gpsp" ]; then
+  [ ! -z "$sram" ] && [ -f "$rsav" ] && mv -f "$rsav" "$sram"
 else
   [ ! -z "$sram" ] && [ -f "$rsram" ] && mv -f "$rsram" "$sram"
 fi
@@ -214,7 +235,12 @@ fi
 
 # Unmount mame config files and remove cache folder
 mountpoint /var/cache/retroarch/${noprefix%%_*} && umount /var/cache/retroarch/${noprefix%%_*}
+mountpoint /var/cache/retroarch/fba && umount /var/cache/retroarch/fba
 rm -rf /var/cache/retroarch/
+
+if [ -f "/media/RA_DEV_MODE" ]; then #Devmode Active (Record current session)
+  echo "Post RA load Core Temp: " $(more /sys/devices/virtual/thermal/thermal_zone0/temp) >> /media/Development_RA_temp.log
+fi
 
 # Clear Caches/Buffers
 sync

@@ -124,13 +124,13 @@ fi
 # Hold R button while starting a game to toggle bezel-mode for this core
 if [ -e "$clovercon_file" ] && [ "$(cat $clovercon_file)" == "0008" ]; then
   [ ! -f "$HOME/bezel-core" ] && touch $HOME/bezel-core
-  if cat $HOME/bezel-core | grep ^$corename$; then
+  if grep ^$corename$ $HOME/bezel-core; then
     sed -i '/^'$corename'$/d' $HOME/bezel-core
   else
     echo $corename >> $HOME/bezel-core
   fi
 fi
-[ -f "$HOME/bezel-core" ] && cat $HOME/bezel-core | grep ^$corename$ && bezel_mode=1
+[ -f "$HOME/bezel-core" ] && grep ^$corename$ $HOME/bezel-core && bezel_mode=1
 
 # Smooth, border and scanlines
 if [ "$bezel_mode" == "1" ]; then

@@ -22,6 +22,9 @@ clovercon_file=/dev/clovercon1
 logend="_RetroArch.log"
 shift 2
 
+#Overcommit this bitch. (Should solve dumb crashes due to memory limits)
+echo "1" > "/proc/sys/vm/overcommit_memory"
+
 if ! echo $corename | grep "prboom\|tyrquake\|cannonball"; then
   umount "$rootfs/share/retroarch/assets/RAloading-min.png"
 fi
